@@ -7,4 +7,6 @@ public interface IPlayerRepository extends JpaRepository<Player, Long> {
 
     boolean existsByName(String name);
 
+    boolean existsById(long player_id);
+
 }

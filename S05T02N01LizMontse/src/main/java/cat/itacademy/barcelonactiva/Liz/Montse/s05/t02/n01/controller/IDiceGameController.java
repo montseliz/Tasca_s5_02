@@ -13,16 +13,21 @@ public interface IDiceGameController {
     /**
      * POST -> /players/add: crea un jugador/a.
      */
-    ResponseEntity<Message> addPlayer(@RequestBody PlayerDTO playerDTO, WebRequest request) throws Exception;
+    ResponseEntity<PlayerDTO> addPlayer(@RequestBody PlayerDTO playerDTO, WebRequest request) throws Exception;
 
     /**
-     * PUT -> /players/update/{id}: modifica el nom del jugador/a.
+     * PUT -> /players/update/{player_id}: modifica el nom del jugador/a.
      */
-    ResponseEntity<Message> updatePlayer(@PathVariable long player_id, @RequestBody PlayerDTO playerDTO, WebRequest request) throws Exception;
+    ResponseEntity<PlayerDTO> updatePlayer(@PathVariable long player_id, @RequestBody PlayerDTO playerDTO, WebRequest request) throws Exception;
 
     /**
-     * POST -> /players/{id}/game: un jugador/a específic realitza una tirada de daus.
+     * POST -> /players/{player_id}/game: un jugador/a específic realitza una tirada de daus.
      */
     ResponseEntity<GameDTO> newGame(@PathVariable long player_id) throws Exception;
+
+    /**
+     * DELETE -> /players/{player_id}/games: elimina les tirades del jugador/a.
+     */
+    ResponseEntity<Message> deleteGames(@PathVariable long player_id, WebRequest request) throws Exception;
 
 }

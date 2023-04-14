@@ -42,17 +42,16 @@ public class DiceGameControllerImpl implements IDiceGameController{
     @Operation(summary = "Create a new player", description = "Adds a new player into the database")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Player created correctly", content = {@Content(mediaType = "application/json",
-                    schema = @Schema(implementation = Message.class))}),
+                    schema = @Schema(implementation = PlayerDTO.class))}),
             @ApiResponse(responseCode = "406", description = "Player's name not valid", content = {@Content(mediaType = "application/json",
                     schema = @Schema(implementation = Message.class))}),
             @ApiResponse(responseCode = "500", description = "Internal Server Error while creating the player", content = {@Content(mediaType = "application/json",
                     schema = @Schema(implementation = Message.class))})})
 
-    public ResponseEntity<Message> addPlayer(@RequestBody PlayerDTO playerDTO, WebRequest request) throws Exception {
+    public ResponseEntity<PlayerDTO> addPlayer(@RequestBody PlayerDTO playerDTO, WebRequest request) throws Exception {
 
         try {
-            playerService.createPlayer(playerDTO);
-            return new ResponseEntity<>(new Message(HttpStatus.CREATED.value(), new Date(), "Player created and added successfully into the database", request.getDescription(false)), HttpStatus.CREATED);
+            return new ResponseEntity<>(playerService.createPlayer(playerDTO), HttpStatus.CREATED);
         } catch (PlayerDuplicatedException e) {
             throw e;
         } catch (Exception e) {
@@ -65,7 +64,7 @@ public class DiceGameControllerImpl implements IDiceGameController{
     @Operation(summary = "Update player's name", description = "Updates an existing player in the database")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Player updated correctly", content = {@Content(mediaType = "application/json",
-                    schema = @Schema(implementation = Message.class))}),
+                    schema = @Schema(implementation = PlayerDTO.class))}),
             @ApiResponse(responseCode = "404", description = "Player not found by id", content = {@Content(mediaType = "application/json",
                     schema = @Schema(implementation = Message.class))}),
             @ApiResponse(responseCode = "406", description = "Player's name not valid", content = {@Content(mediaType = "application/json",
@@ -73,11 +72,10 @@ public class DiceGameControllerImpl implements IDiceGameController{
             @ApiResponse(responseCode = "500", description = "Internal Server Error while updating the player", content = {@Content(mediaType = "application/json",
                     schema = @Schema(implementation = Message.class))})})
 
-    public ResponseEntity<Message> updatePlayer(@Parameter(description = "The id of the player to be updated") @PathVariable long player_id, @RequestBody PlayerDTO playerDTO, WebRequest request) throws Exception {
+    public ResponseEntity<PlayerDTO> updatePlayer(@Parameter(description = "The id of the player to be updated") @PathVariable long player_id, @RequestBody PlayerDTO playerDTO, WebRequest request) throws Exception {
 
         try {
-            playerService.editPlayer(player_id, playerDTO);
-            return new ResponseEntity<>(new Message(HttpStatus.OK.value(), new Date(), "Player updated correctly", request.getDescription(false)), HttpStatus.OK);
+            return new ResponseEntity<>(playerService.editPlayer(player_id, playerDTO), HttpStatus.OK);
         } catch (PlayerNotFoundException e) {
             throw e;
         } catch (PlayerDuplicatedException e) {
@@ -104,11 +102,33 @@ public class DiceGameControllerImpl implements IDiceGameController{
             return new ResponseEntity<>(gameService.createGame(player_id), HttpStatus.CREATED);
         } catch (PlayerNotFoundException e) {
             throw e;
-        } catch (ArithmeticException e) {
-            throw e;
         } catch (Exception e) {
             throw new Exception("Internal Server Error while creating the game", e.getCause());
         }
     }
+
+    @Override
+    @DeleteMapping(value = "/{player_id}/games", produces = "application/json")
+    @Operation(summary = "Delete player's games history", description = "Deletes the player's entire games history from the database")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Games removed successfully", content = {@Content(mediaType = "application/json",
+                    schema = @Schema(implementation = Message.class))}),
+            @ApiResponse(responseCode = "404", description = "Player not found by id", content = {@Content(mediaType = "application/json",
+                    schema = @Schema(implementation = Message.class))}),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error while deleting the player's games history", content = {@Content(mediaType = "application/json",
+                    schema = @Schema(implementation = Message.class))})})
+
+    public ResponseEntity<Message> deleteGames(@Parameter(description = "The id of the player whose games are to be deleted") @PathVariable long player_id, WebRequest request) throws Exception {
+        try {
+            gameService.removeGamesByPlayer(player_id);
+            return new ResponseEntity<>(new Message(HttpStatus.OK.value(), new Date(), "Games history removed successfully", request.getDescription(false)), HttpStatus.OK);
+        } catch (PlayerNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new Exception("Internal Server Error while deleting games history", e.getCause());
+        }
+    }
+
+
 
 }

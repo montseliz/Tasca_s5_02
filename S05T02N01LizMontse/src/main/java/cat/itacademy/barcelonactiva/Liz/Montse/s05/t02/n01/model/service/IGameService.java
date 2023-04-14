@@ -6,8 +6,8 @@ import java.util.Set;
 
 public interface IGameService {
 
-    Set<GameDTO> getGamesHistoryByPlayer(long id);
-    GameDTO createGame(long id);
-    void removeGamesByPlayer(long id);
+    Set<GameDTO> getGamesHistoryByPlayer(long player_id);
+    GameDTO createGame(long player_id);
+    void removeGamesByPlayer(long player_id);
 
 }

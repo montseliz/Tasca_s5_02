@@ -1,5 +1,6 @@
 package cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.domain.mysql;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,8 +8,9 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Data
 @AllArgsConstructor
@@ -20,13 +22,20 @@ public class Player {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "player_id")
+    @Schema(description = "Identifier of the player", example = "1")
     private long player_id;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
+    @Schema(description = "Username of the player", example = "Montse")
     private String name;
 
-    @Column (name = "registration_date", nullable = false)
+    /**
+     * L'atribut s'inicialitza automàticament (amb l'hora i data locals) en l'instant en què es crea una nova instància de Player,
+     * gràcies a l'anotació @CreationTimestamp.
+     */
+    @Column(name = "registration_date", nullable = false)
     @CreationTimestamp
+    @Schema(description = "Registration date of the player", example = "2023-04-10 18:46:38.227499")
     private LocalDateTime registration;
 
     /**
@@ -38,11 +47,16 @@ public class Player {
      * que s'apliquin a l'entitat Player, també s'aplicaran automàticament a l'entitat Game.
      */
     @OneToMany(mappedBy = "player", fetch = FetchType.EAGER, orphanRemoval = true, targetEntity = Game.class, cascade = CascadeType.ALL)
-    private Set<Game> gamesHistory = new HashSet<>();
+    @Schema(description = "Player's games history", example = "[Game{game_id=1, dice1=4, dice2=3, result=WINNER, player=1}, Game{game_id=2, dice1=5, dice2=1, result=LOSER, player=1}]")
+    private List<Game> gamesHistory = new ArrayList<>();
 
     public Player(String name) {
         this.name = name;
         this.registration = LocalDateTime.now();
+    }
+
+    public void addGamesHistory(Game game) {
+        gamesHistory.add(game);
     }
 
 }

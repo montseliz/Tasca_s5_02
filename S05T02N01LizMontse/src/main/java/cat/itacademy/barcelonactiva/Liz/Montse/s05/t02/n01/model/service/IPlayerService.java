@@ -7,11 +7,11 @@ import java.util.List;
 
 public interface IPlayerService {
 
-    Player getPlayerById(long id); //TODO: POSSIBLE ELIMINACIÓ SI NO EL FAIG SERVIR
-    PlayerDTO getPlayerDTOById(long id);
+    Player getPlayerById(long player_id);
+    PlayerDTO getPlayerDTOById(long player_id); //TODO: RECORDAR TREURE'L SI NO L'UTILITZO AL FINAL
     List<PlayerDTO> getListPlayers();
-    void createPlayer(PlayerDTO playerDTO);
-    void editPlayer(long id, PlayerDTO playerDTO);
+    PlayerDTO createPlayer(PlayerDTO playerDTO);
+    PlayerDTO editPlayer(long player_id, PlayerDTO playerDTO);
     List<PlayerDTO> getWinningAverage();
     PlayerDTO getMostLoser();
     PlayerDTO getMostWinner();
