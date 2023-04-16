@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @Getter
@@ -16,12 +16,16 @@ public class Message {
     private int statusCode;
 
     @Schema(description = "Date and time", example = "2023-04-12T21:04:31.274+00:00")
-    private Date timestamp;
+    private LocalDateTime timestamp;
 
     @Schema(description = "Description message", example = "Player created and added successfully into the database")
     private String textMessage;
 
     @Schema(description = "Uri path", example = "uri=/players/add")
     private String description;
+
+    public Message(String textMessage) {
+        this.textMessage = textMessage;
+    }
 
 }

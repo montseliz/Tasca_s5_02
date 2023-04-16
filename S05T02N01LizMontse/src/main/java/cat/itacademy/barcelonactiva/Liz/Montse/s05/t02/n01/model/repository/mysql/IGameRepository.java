@@ -5,5 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface IGameRepository extends JpaRepository<Game, Long> {
 
-
+    default boolean isEmpty() {
+        return count() == 0;
+    }
 }
+

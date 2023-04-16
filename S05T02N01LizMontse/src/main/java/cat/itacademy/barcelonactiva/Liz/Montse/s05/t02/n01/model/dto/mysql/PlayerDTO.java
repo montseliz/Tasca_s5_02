@@ -22,7 +22,7 @@ public class PlayerDTO {
     private LocalDateTime registration;
 
     @Schema(description = "Player's winning percentage", example = "8.5")
-    private double winPercentage;
+    private String winPercentage;
 
     public PlayerDTO(String name) {
         this.name = name;

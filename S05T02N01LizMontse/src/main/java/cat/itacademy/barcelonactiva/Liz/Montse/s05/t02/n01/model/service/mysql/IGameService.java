@@ -1,13 +1,13 @@
-package cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.service;
+package cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.service.mysql;
 
 import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.dto.mysql.GameDTO;
 
-import java.util.Set;
+import java.util.List;
 
 public interface IGameService {
 
-    Set<GameDTO> getGamesHistoryByPlayer(long player_id);
     GameDTO createGame(long player_id);
     void removeGamesByPlayer(long player_id);
+    List<GameDTO> getGamesHistoryByPlayer(long player_id);
 
 }

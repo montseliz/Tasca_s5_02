@@ -1,4 +1,4 @@
-package cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.service.tools;
+package cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.service.mysql.tools;
 
 import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.domain.mysql.Game;
 import java.util.Random;

@@ -6,8 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import static cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.service.tools.Helpers.obtainResult;
-import static cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.service.tools.Helpers.rollDice;
+import static cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.service.mysql.tools.Helpers.obtainResult;
+import static cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.service.mysql.tools.Helpers.rollDice;
 
 @Data
 @AllArgsConstructor

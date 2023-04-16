@@ -1,9 +1,10 @@
-package cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.service;
+package cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.service.mysql;
 
 import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.domain.mysql.Game;
 import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.domain.mysql.Player;
 import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.dto.mysql.GameDTO;
 import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.dto.mysql.PlayerDTO;
+import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.exception.GamesNotFoundException;
 import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.exception.PlayerDuplicatedException;
 import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.exception.PlayerNotFoundException;
 import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.repository.mysql.IGameRepository;
@@ -13,10 +14,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.domain.mysql.Game.ResultGame.WINNER;
@@ -50,16 +51,8 @@ public class DiceGameServiceImpl implements IPlayerService, IGameService {
         return modelMapper.map(game, GameDTO.class);
     }
 
-    private Game convertDTOToGame(GameDTO gameDTO) {
-        return modelMapper.map(gameDTO, Game.class);
-    }
-
-    private List<GameDTO> convertGameListToDTO(List<Game> gamesHistory) { //TODO: RECORDAR TREURE'L SI NO L'UTILITZO
+    private List<GameDTO> convertGameListToDTO(List<Game> gamesHistory) {
         return gamesHistory.stream().map(this::convertGameToDTO).collect(Collectors.toList());
-    }
-
-    private List<Game> convertDTOToGameList(List<GameDTO> gamesHistory) { //TODO: RECORDAR TREURE'L SI NO L'UTILITZO
-        return gamesHistory.stream().map(this::convertDTOToGame).collect(Collectors.toList());
     }
     //endregion CONVERTERS
 
@@ -74,17 +67,11 @@ public class DiceGameServiceImpl implements IPlayerService, IGameService {
     }
 
     @Override
-    public PlayerDTO getPlayerDTOById(long player_id) {
-        Player playerToConvert = getPlayerById(player_id);
-        return convertPlayerToDTO(playerToConvert);
-    }
-
-    @Override
-    public List<PlayerDTO> getListPlayers() {
+    public List<Player> getListPlayers() {
         if (playerRepository.findAll().isEmpty()) {
             throw new PlayerNotFoundException("There are no players introduced in the database");
         } else {
-            return playerRepository.findAll().stream().map(this::convertPlayerToDTO).collect(Collectors.toList());
+            return playerRepository.findAll();
         }
     }
 
@@ -92,8 +79,10 @@ public class DiceGameServiceImpl implements IPlayerService, IGameService {
     public PlayerDTO createPlayer(PlayerDTO playerDTO) {
         PlayerDTO playerValidated = validatePlayerName(playerDTO);
         Player playerSaved = playerRepository.save(convertDTOToPlayer(playerValidated));
+        PlayerDTO playerDTOToReturn = convertPlayerToDTO(playerSaved);
+        playerDTOToReturn.setWinPercentage("No games played yet");
 
-        return convertPlayerToDTO(playerSaved);
+        return playerDTOToReturn;
     }
 
     @Override
@@ -105,27 +94,41 @@ public class DiceGameServiceImpl implements IPlayerService, IGameService {
 
         Player playerUpdated = playerRepository.save(playerToUpdate);
 
-        return convertPlayerToDTO(playerUpdated);
+        return obtainWinPercentage(playerUpdated);
     }
 
     @Override
-    public List<PlayerDTO> getWinningAverage() {
-        return null;
+    public List<PlayerDTO> getPlayersWithWinPercentage() {
+        List<Player> allPlayers = getListPlayers();
+        List<PlayerDTO> allPlayersDTO = new ArrayList<>();
+
+        allPlayers.forEach(p -> allPlayersDTO.add(obtainWinPercentage(p)));
+        return allPlayersDTO;
+    }
+
+    @Override
+    public String getWinningAverage() {
+        List<PlayerDTO> playersWhoPlayed = playersWhoPlayed();
+
+        double totalWinPercentage = playersWhoPlayed.stream().mapToDouble(p -> Double.parseDouble(p.getWinPercentage().replace(",", "."))).sum();
+
+        double winningAverage = totalWinPercentage / playersWhoPlayed.size();
+
+        return "Players average wins: " + String.format("%.2f", winningAverage);
     }
 
     @Override
     public PlayerDTO getMostLoser() {
-        return null;
+        List<PlayerDTO> playersWhoPlayed = playersWhoPlayed();
+
+        return playersWhoPlayed.stream().min(Comparator.comparingDouble(p -> Double.parseDouble(p.getWinPercentage().replace(",", ".")))).get();
     }
 
     @Override
     public PlayerDTO getMostWinner() {
-        return null;
-    }
+        List<PlayerDTO> playersWhoPlayed = playersWhoPlayed();
 
-    @Override
-    public Set<GameDTO> getGamesHistoryByPlayer(long player_id) {
-        return null;
+        return playersWhoPlayed.stream().max(Comparator.comparingDouble(p -> Double.parseDouble(p.getWinPercentage().replace(",", ".")))).get();
     }
 
     @Override
@@ -155,8 +158,15 @@ public class DiceGameServiceImpl implements IPlayerService, IGameService {
     @Override
     @Transactional
     public void removeGamesByPlayer(long player_id) {
-        Player playerById = getPlayerById(player_id);
-        playerById.getGamesHistory().removeAll(playerById.getGamesHistory());
+        List<Game> gamesToRemove = ifExistsGames(player_id);
+
+        gamesToRemove.clear();
+    }
+
+    @Override
+    public List<GameDTO> getGamesHistoryByPlayer(long player_id) {
+
+        return convertGameListToDTO(ifExistsGames(player_id));
     }
 
     /**
@@ -185,19 +195,22 @@ public class DiceGameServiceImpl implements IPlayerService, IGameService {
 
     /**
      * Mètode encarregat de calcular el percentatge de victòries del Player.
+     * S'utilitza en el mètode editPlayer() i getPlayersWithWinPercentage().
      */
-    public double obtainWinPercentage(Player player) {
+    public PlayerDTO obtainWinPercentage(Player player) {
         Player playerValidated = ifExistsPlayer(player);
+        PlayerDTO playerDTOToReturn = convertPlayerToDTO(playerValidated);
 
         if (playerValidated.getGamesHistory().isEmpty()) {
-            throw new ArithmeticException("Cannot calculate a player's winning percentage with no games played");
+            playerDTOToReturn.setWinPercentage("Cannot calculate a player's winning percentage with no games played");
         } else {
             long totalGames = playerValidated.getGamesHistory().size();
             long totalWins = playerValidated.getGamesHistory().stream().filter(g -> g.getResult() == WINNER).count();
             double winPercentage = ((double) totalWins / totalGames) * 100.0d;
-            DecimalFormat df = new DecimalFormat("#.##");
-            return Double.parseDouble(df.format(winPercentage));
+
+            playerDTOToReturn.setWinPercentage(String.format("%.2f", winPercentage));
         }
+        return playerDTOToReturn;
     }
 
     /**
@@ -209,6 +222,34 @@ public class DiceGameServiceImpl implements IPlayerService, IGameService {
             return player;
         } else {
             throw new PlayerNotFoundException("Player not found in the database");
+        }
+    }
+
+    /**
+     * Mètode per validar l'existència de games per player a la base de dades.
+     * S'utilitza en els mètodes removeGamesByPlayer() i getGamesHistoryByPlayer().
+     */
+    public List<Game> ifExistsGames(long player_id) {
+        Player playerById = getPlayerById(player_id);
+        if (playerById.getGamesHistory().isEmpty()) {
+            throw new GamesNotFoundException("There are no games played by " + playerById.getName());
+        } else {
+            return playerById.getGamesHistory();
+        }
+    }
+
+    /**
+     * Mètode per obtenir només els jugadors que han jugat.
+     * S'utilitza en els mètodes getWinningAverage(), getMostLoser() i getMostWinner().
+     */
+    public List<PlayerDTO> playersWhoPlayed() {
+        List<PlayerDTO> allPlayersDTO = getPlayersWithWinPercentage();
+
+        if (gameRepository.isEmpty()) {
+            throw new GamesNotFoundException("There are no games stored in the database");
+        } else {
+            return allPlayersDTO.stream().filter(p -> !p.getWinPercentage().equals("No games played yet")
+                    && !p.getWinPercentage().equals("Cannot calculate a player's winning percentage with no games played")).collect(Collectors.toList());
         }
     }
 
