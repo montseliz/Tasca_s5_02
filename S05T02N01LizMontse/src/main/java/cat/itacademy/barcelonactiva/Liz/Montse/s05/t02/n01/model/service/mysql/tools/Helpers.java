@@ -3,7 +3,6 @@ package cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.service.mysql.
 import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.domain.mysql.Game;
 import java.util.Random;
 
-
 public class Helpers {
 
     /**
