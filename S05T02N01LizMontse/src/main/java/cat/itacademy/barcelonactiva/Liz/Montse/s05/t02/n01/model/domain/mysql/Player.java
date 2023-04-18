@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -33,8 +32,8 @@ public class Player {
      * L'atribut s'inicialitza automàticament (amb l'hora i data locals) en l'instant en què es crea una nova instància de Player,
      * gràcies a l'anotació @CreationTimestamp.
      */
-    @Column(name = "registration_date", nullable = false)
     @CreationTimestamp
+    @Column(name = "registration_date", nullable = false)
     @Schema(description = "Registration date of the player", example = "2023-04-10 18:46:38.227499")
     private LocalDateTime registration;
 

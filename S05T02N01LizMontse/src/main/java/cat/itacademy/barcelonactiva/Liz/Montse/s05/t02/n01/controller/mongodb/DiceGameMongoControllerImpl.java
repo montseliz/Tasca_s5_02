@@ -1,13 +1,13 @@
-package cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.controller.mysql;
+package cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.controller.mongodb;
 
-import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.dto.mysql.GameDTO;
 import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.dto.Message;
-import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.dto.mysql.PlayerDTO;
+import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.dto.mongodb.GameMongoDTO;
+import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.dto.mongodb.PlayerMongoDTO;
 import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.exception.GamesNotFoundException;
 import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.exception.PlayerDuplicatedException;
 import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.exception.PlayerNotFoundException;
-import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.service.mysql.IGameService;
-import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.service.mysql.IPlayerService;
+import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.service.mongodb.IGameMongoService;
+import cat.itacademy.barcelonactiva.Liz.Montse.s05.t02.n01.model.service.mongodb.IPlayerMongoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,15 +27,15 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/players")
-@Tag(name = "Dice Game MySQL API", description = "API operations pertaining to Dice Game MySQL database")
-public class DiceGameControllerImpl implements IDiceGameController{
+@RequestMapping("/playersMongo")
+@Tag(name = "Dice Game MongoDB API", description = "API operations pertaining to Dice Game MongoDB database")
+public class DiceGameMongoControllerImpl implements IDiceGameMongoController{
 
-    private final IPlayerService playerService;
-    private final IGameService gameService;
+    private final IPlayerMongoService playerService;
+    private final IGameMongoService gameService;
 
     @Autowired
-    public DiceGameControllerImpl(IPlayerService playerService, IGameService gameService) {
+    public DiceGameMongoControllerImpl(IPlayerMongoService playerService, IGameMongoService gameService) {
         super();
         this.playerService = playerService;
         this.gameService = gameService;
@@ -45,13 +46,13 @@ public class DiceGameControllerImpl implements IDiceGameController{
     @Operation(summary = "Create a new player", description = "Adds a new player into the database")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Player created correctly", content = {@Content(mediaType = "application/json",
-                    schema = @Schema(implementation = PlayerDTO.class))}),
+                    schema = @Schema(implementation = PlayerMongoDTO.class))}),
             @ApiResponse(responseCode = "406", description = "Player's name not valid", content = {@Content(mediaType = "application/json",
                     schema = @Schema(implementation = Message.class))}),
             @ApiResponse(responseCode = "500", description = "Internal Server Error while creating the player", content = {@Content(mediaType = "application/json",
                     schema = @Schema(implementation = Message.class))})})
 
-    public ResponseEntity<PlayerDTO> addPlayer(@RequestBody PlayerDTO playerDTO) throws Exception {
+    public ResponseEntity<PlayerMongoDTO> addPlayer(@RequestBody PlayerMongoDTO playerDTO) throws Exception {
 
         try {
             return new ResponseEntity<>(playerService.createPlayer(playerDTO), HttpStatus.CREATED);
@@ -63,11 +64,11 @@ public class DiceGameControllerImpl implements IDiceGameController{
     }
 
     @Override
-    @PutMapping(value = "/update/{player_id}", produces = "application/json", consumes = "application/json")
+    @PutMapping(value = "/update/{id}", produces = "application/json", consumes = "application/json")
     @Operation(summary = "Update player's name", description = "Updates an existing player in the database")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Player updated correctly", content = {@Content(mediaType = "application/json",
-                    schema = @Schema(implementation = PlayerDTO.class))}),
+                    schema = @Schema(implementation = PlayerMongoDTO.class))}),
             @ApiResponse(responseCode = "404", description = "Player not found by id", content = {@Content(mediaType = "application/json",
                     schema = @Schema(implementation = Message.class))}),
             @ApiResponse(responseCode = "406", description = "Player's name not valid", content = {@Content(mediaType = "application/json",
@@ -75,10 +76,10 @@ public class DiceGameControllerImpl implements IDiceGameController{
             @ApiResponse(responseCode = "500", description = "Internal Server Error while updating the player", content = {@Content(mediaType = "application/json",
                     schema = @Schema(implementation = Message.class))})})
 
-    public ResponseEntity<PlayerDTO> updatePlayer(@Parameter(description = "The id of the player to be updated") @PathVariable long player_id, @RequestBody PlayerDTO playerDTO) throws Exception {
+    public ResponseEntity<PlayerMongoDTO> updatePlayer(@Parameter(description = "The id of the player to be updated") @PathVariable ObjectId id, @RequestBody PlayerMongoDTO playerDTO) throws Exception {
 
         try {
-            return new ResponseEntity<>(playerService.editPlayer(player_id, playerDTO), HttpStatus.OK);
+            return new ResponseEntity<>(playerService.editPlayer(id, playerDTO), HttpStatus.OK);
         } catch (PlayerNotFoundException | PlayerDuplicatedException e) {
             throw e;
         } catch (Exception e) {
@@ -87,20 +88,20 @@ public class DiceGameControllerImpl implements IDiceGameController{
     }
 
     @Override
-    @PostMapping(value = "/{player_id}/game", produces = "application/json")
+    @PostMapping(value = "/{id}/game", produces = "application/json")
     @Operation(summary = "Create a new game", description = "Adds a new game into the database")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Game created correctly", content = {@Content(mediaType = "application/json",
-                    schema = @Schema(implementation = GameDTO.class))}),
+                    schema = @Schema(implementation = GameMongoDTO.class))}),
             @ApiResponse(responseCode = "404", description = "Player not found by id", content = {@Content(mediaType = "application/json",
                     schema = @Schema(implementation = Message.class))}),
             @ApiResponse(responseCode = "500", description = "Internal Server Error while creating the game", content = {@Content(mediaType = "application/json",
                     schema = @Schema(implementation = Message.class))})})
 
-    public ResponseEntity<GameDTO> newGame(@Parameter(description = "The id of the player playing the game") @PathVariable long player_id) throws Exception {
+    public ResponseEntity<GameMongoDTO> newGame(@Parameter(description = "The id of the player playing the game") @PathVariable ObjectId id) throws Exception {
 
         try {
-            return new ResponseEntity<>(gameService.createGame(player_id), HttpStatus.CREATED);
+            return new ResponseEntity<>(gameService.createGame(id), HttpStatus.CREATED);
         } catch (PlayerNotFoundException e) {
             throw e;
         } catch (Exception e) {
@@ -109,7 +110,7 @@ public class DiceGameControllerImpl implements IDiceGameController{
     }
 
     @Override
-    @DeleteMapping(value = "/{player_id}/games", produces = "application/json")
+    @DeleteMapping(value = "/{id}/games", produces = "application/json")
     @Operation(summary = "Delete player's games history", description = "Deletes the player's entire games history from the database")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Games removed successfully", content = {@Content(mediaType = "application/json",
@@ -121,10 +122,10 @@ public class DiceGameControllerImpl implements IDiceGameController{
             @ApiResponse(responseCode = "500", description = "Internal Server Error while deleting the player's games history", content = {@Content(mediaType = "application/json",
                     schema = @Schema(implementation = Message.class))})})
 
-    public ResponseEntity<Message> deleteGames(@Parameter(description = "The id of the player whose games are to be deleted") @PathVariable long player_id, WebRequest request) throws Exception {
+    public ResponseEntity<Message> deleteGames(@Parameter(description = "The id of the player whose games are to be deleted") @PathVariable ObjectId id, WebRequest request) throws Exception {
 
         try {
-            gameService.removeGamesByPlayer(player_id);
+            gameService.removeGamesByPlayer(id);
             return new ResponseEntity<>(new Message(HttpStatus.OK.value(), LocalDateTime.now(), "Games history removed successfully", request.getDescription(false)), HttpStatus.OK);
         } catch (PlayerNotFoundException | GamesNotFoundException e) {
             throw e;
@@ -138,13 +139,13 @@ public class DiceGameControllerImpl implements IDiceGameController{
     @Operation(summary = "Get all players", description = "Returns a list with all players stored in the database")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of players retrieved successfully", content = {@Content(mediaType = "application/json",
-                    array = @ArraySchema(schema = @Schema(implementation = PlayerDTO.class)))}),
+                    array = @ArraySchema(schema = @Schema(implementation = PlayerMongoDTO.class)))}),
             @ApiResponse(responseCode = "404", description = "There are no players introduced in the database", content = {@Content(mediaType = "application/json",
                     schema = @Schema(implementation = Message.class))}),
             @ApiResponse(responseCode = "500", description = "Internal Server Error while retrieving the players from the database", content = {@Content(mediaType = "application/json",
                     schema = @Schema(implementation = Message.class))})})
 
-    public ResponseEntity<List<PlayerDTO>> getAllPlayers() throws Exception {
+    public ResponseEntity<List<PlayerMongoDTO>> getAllPlayers() throws Exception {
 
         try {
             return new ResponseEntity<>(playerService.getPlayersWithWinPercentage(), HttpStatus.OK);
@@ -156,11 +157,11 @@ public class DiceGameControllerImpl implements IDiceGameController{
     }
 
     @Override
-    @GetMapping(value = "/{player_id}/games", produces = "application/json")
+    @GetMapping(value = "/{id}/games", produces = "application/json")
     @Operation(summary = "Get all games by player", description = "Returns a list with all games played by the player stored in the database")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of games by player retrieved successfully", content = {@Content(mediaType = "application/json",
-                    array = @ArraySchema(schema = @Schema(implementation = GameDTO.class)))}),
+                    array = @ArraySchema(schema = @Schema(implementation = GameMongoDTO.class)))}),
             @ApiResponse(responseCode = "404", description = "Player not found by id", content = {@Content(mediaType = "application/json",
                     schema = @Schema(implementation = Message.class))}),
             @ApiResponse(responseCode = "404", description = "Games not found by player", content = {@Content(mediaType = "application/json",
@@ -168,10 +169,10 @@ public class DiceGameControllerImpl implements IDiceGameController{
             @ApiResponse(responseCode = "500", description = "Internal Server Error while retrieving the games by player from the database", content = {@Content(mediaType = "application/json",
                     schema = @Schema(implementation = Message.class))})})
 
-    public ResponseEntity<List<GameDTO>> getAllGamesByPlayer(@Parameter(description = "The id of the player whose games are to be retrieved") @PathVariable long player_id) throws Exception {
+    public ResponseEntity<List<GameMongoDTO>> getAllGamesByPlayer(@Parameter(description = "The id of the player whose games are to be retrieved") @PathVariable ObjectId id) throws Exception {
 
         try {
-            return new ResponseEntity<>(gameService.getGamesHistoryByPlayer(player_id), HttpStatus.OK);
+            return new ResponseEntity<>(gameService.getGamesHistoryByPlayer(id), HttpStatus.OK);
         } catch (PlayerNotFoundException | GamesNotFoundException e) {
             throw e;
         } catch (Exception e) {
@@ -208,7 +209,7 @@ public class DiceGameControllerImpl implements IDiceGameController{
     @Operation(summary = "Get the most loser player", description = "Returns the most losing player stored in the database")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Most losing player retrieved successfully", content = {@Content(mediaType = "application/json",
-                    array = @ArraySchema(schema = @Schema(implementation = PlayerDTO.class)))}),
+                    array = @ArraySchema(schema = @Schema(implementation = PlayerMongoDTO.class)))}),
             @ApiResponse(responseCode = "404", description = "There are no players introduced in the database", content = {@Content(mediaType = "application/json",
                     schema = @Schema(implementation = Message.class))}),
             @ApiResponse(responseCode = "404", description = "Games not found in the database", content = {@Content(mediaType = "application/json",
@@ -216,11 +217,11 @@ public class DiceGameControllerImpl implements IDiceGameController{
             @ApiResponse(responseCode = "500", description = "Internal Server Error while retrieving the most losing player from the database", content = {@Content(mediaType = "application/json",
                     schema = @Schema(implementation = Message.class))})})
 
-    public ResponseEntity<PlayerDTO> getLoser() throws Exception {
+    public ResponseEntity<PlayerMongoDTO> getLoser() throws Exception {
 
         try {
             return new ResponseEntity<>(playerService.getMostLoser(), HttpStatus.OK);
-        } catch (PlayerNotFoundException | GamesNotFoundException e) {
+        } catch (PlayerNotFoundException | GamesNotFoundException e ) {
             throw e;
         } catch (Exception e) {
             throw new Exception("Internal Server Error while retrieving the most losing player from the database", e.getCause());
@@ -232,7 +233,7 @@ public class DiceGameControllerImpl implements IDiceGameController{
     @Operation(summary = "Get the most winner player", description = "Returns the most winner player stored in the database")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Most winner player retrieved successfully", content = {@Content(mediaType = "application/json",
-                    array = @ArraySchema(schema = @Schema(implementation = PlayerDTO.class)))}),
+                    array = @ArraySchema(schema = @Schema(implementation = PlayerMongoDTO.class)))}),
             @ApiResponse(responseCode = "404", description = "There are no players introduced in the database", content = {@Content(mediaType = "application/json",
                     schema = @Schema(implementation = Message.class))}),
             @ApiResponse(responseCode = "404", description = "Games not found in the database", content = {@Content(mediaType = "application/json",
@@ -240,7 +241,7 @@ public class DiceGameControllerImpl implements IDiceGameController{
             @ApiResponse(responseCode = "500", description = "Internal Server Error while retrieving the most winner player from the database", content = {@Content(mediaType = "application/json",
                     schema = @Schema(implementation = Message.class))})})
 
-    public ResponseEntity<PlayerDTO> getWinner() throws Exception {
+    public ResponseEntity<PlayerMongoDTO> getWinner() throws Exception {
 
         try {
             return new ResponseEntity<>(playerService.getMostWinner(), HttpStatus.OK);

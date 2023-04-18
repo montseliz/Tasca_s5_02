@@ -56,6 +56,7 @@ Has de tindre en compte els  següents detalls de  construcció:
 
 - https://www.bezkoder.com/jpa-one-to-many/ 
 - https://www.javaguides.net/2022/02/spring-data-jpa-one-to-many-bidirectional-mapping.html
+- https://www.bezkoder.com/spring-boot-jwt-authentication/ 
 
 
 
