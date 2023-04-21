@@ -51,13 +51,14 @@ Has de tindre en compte els  següents detalls de  construcció:
 - **Fase 3:**
 
     Afegeix seguretat: inclou autenticació per JWT en  tots els accessos a les URL's del microservei. 
+        
+    **Seguretat aplicada en el repositori: https://github.com/montseliz/Tasca_s5_02_Security**
 
 ### Recursos utilitzats
 
 - https://www.bezkoder.com/jpa-one-to-many/ 
 - https://www.javaguides.net/2022/02/spring-data-jpa-one-to-many-bidirectional-mapping.html
-- https://www.bezkoder.com/spring-boot-jwt-authentication/ 
-
+- https://devops.datenkollektiv.de/banner.txt/index.html
 
 
 ## Nivell 2
@@ -65,18 +66,16 @@ Has de tindre en compte els  següents detalls de  construcció:
 Afegeix tests unitaris, de component i d'integració al projecte amb llibreries jUnit, AssertJ o Hamcrest.
 Afegeix Mocks al testing del projecte (Mockito) i Contract Tests (https://docs.pact.io/).
 
+ **Tests aplicats en el repositori amb seguretat: https://github.com/montseliz/Tasca_s5_02_Security**
+
 ### Recursos utilitzats
 
-- 
-
+- https://www.youtube.com/playlist?list=PL82C6-O4XrHcg8sNwpoDDhcxUCbFy855E 
 
 
 ## Nivell 3
 
 Dissenya i modifica el projecte diversificant la persistència perquè faci servir dos esquemes de base de dades alhora, MySQL i Mongo.
 
-### Recursos utilitzats
-
-- 
 
 

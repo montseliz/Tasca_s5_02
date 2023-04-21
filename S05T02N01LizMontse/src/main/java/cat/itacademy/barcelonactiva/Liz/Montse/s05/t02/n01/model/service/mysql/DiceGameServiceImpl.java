@@ -138,7 +138,6 @@ public class DiceGameServiceImpl implements IPlayerService, IGameService {
         Game newGame = new Game(playerById);
         playerById.addGamesHistory(newGame);
         gameRepository.save(newGame);
-        playerRepository.save(playerById);
 
         return convertGameToDTO(newGame);
     }
