@@ -66,7 +66,7 @@ Has de tindre en compte els  següents detalls de  construcció:
 Afegeix tests unitaris, de component i d'integració al projecte amb llibreries jUnit, AssertJ o Hamcrest.
 Afegeix Mocks al testing del projecte (Mockito) i Contract Tests (https://docs.pact.io/).
 
- **Tests aplicats en el repositori amb seguretat: https://github.com/montseliz/Tasca_s5_02_Security**
+**Tests aplicats en el repositori amb seguretat: https://github.com/montseliz/Tasca_s5_02_Security**
 
 ### Recursos utilitzats
 
@@ -77,5 +77,5 @@ Afegeix Mocks al testing del projecte (Mockito) i Contract Tests (https://docs.p
 
 Dissenya i modifica el projecte diversificant la persistència perquè faci servir dos esquemes de base de dades alhora, MySQL i Mongo.
 
-
+**Persistència doble amb seguretat en el repositori: https://github.com/montseliz/Tasca_s5_02_Security**
 
