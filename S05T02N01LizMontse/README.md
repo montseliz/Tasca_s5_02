@@ -81,20 +81,20 @@
 
 ### Request POST:
 
-- #### /players/add: crea un jugador/a
+- #### /playersMongo/add: crea un jugador/a
 
 ![addmongo.PNG](captures%2Faddmongo.PNG)
 ![addmongo2.PNG](captures%2Faddmongo2.PNG)
 ![addmongo3.PNG](captures%2Faddmongo3.PNG)
 
-- #### /players/{id}/game: un jugador/a específic realitza una tirada de daus
+- #### /playersMongo/{id}/game: un jugador/a específic realitza una tirada de daus
 
 ![addgamemongo.PNG](captures%2Faddgamemongo.PNG)
 ![addgamemongo2.PNG](captures%2Faddgamemongo2.PNG)
 
 ### Request PUT:
 
-- #### /players/update/{id}: modifica el nom del jugador/a
+- #### /playersMongo/update/{id}: modifica el nom del jugador/a
 
 ![putmongo.PNG](captures%2Fputmongo.PNG)
 ![putmongo2.PNG](captures%2Fputmongo2.PNG)
@@ -102,7 +102,7 @@
 
 ### Request DELETE:
 
-- #### /players/{id}/games: elimina les tirades del jugador/a
+- #### /playersMongo/{id}/games: elimina les tirades del jugador/a
 
 ![deletemongo.PNG](captures%2Fdeletemongo.PNG)
 ![deletemongo2.PNG](captures%2Fdeletemongo2.PNG)
@@ -110,30 +110,30 @@
 
 ### Request GET:
 
-- #### /players/: retorna el llistat de tots els jugadors/es del sistema amb el seu percentatge mitjà d’èxits
+- #### /playersMongo/: retorna el llistat de tots els jugadors/es del sistema amb el seu percentatge mitjà d’èxits
 
 ![getallmongo.PNG](captures%2Fgetallmongo.PNG)
 ![getallmongo2.PNG](captures%2Fgetallmongo2.PNG)
 
-- #### /players/{id}/games: retorna el llistat de jugades per un jugador/a
+- #### /playersMongo/{id}/games: retorna el llistat de jugades per un jugador/a
 
 ![getallgamesmongo.PNG](captures%2Fgetallgamesmongo.PNG)
 ![getallgamesmongo2.PNG](captures%2Fgetallgamesmongo2.PNG)
 ![getallgamesmongo3.PNG](captures%2Fgetallgamesmongo3.PNG)
 
-- #### /players/ranking: retorna el ranking mig de tots els jugadors/es del sistema. És a dir, el percentatge mitjà d’èxits
+- #### /playersMongo/ranking: retorna el ranking mig de tots els jugadors/es del sistema. És a dir, el percentatge mitjà d’èxits
 
 ![rankingmongo.PNG](captures%2Frankingmongo.PNG)
 ![rankingmongo2.PNG](captures%2Frankingmongo2.PNG)
 ![rankingmongo3.PNG](captures%2Frankingmongo3.PNG)
 
-- #### /players/ranking/loser: retorna el jugador/a amb pitjor percentatge d’èxit
+- #### /playersMongo/ranking/loser: retorna el jugador/a amb pitjor percentatge d’èxit
 
 ![losermongo.PNG](captures%2Flosermongo.PNG)
 ![losermongo2.PNG](captures%2Flosermongo2.PNG)
 ![losermongo3.PNG](captures%2Flosermongo3.PNG)
 
-- #### /players/ranking/winner: retorna el jugador amb pitjor percentatge d’èxit
+- #### /playersMongo/ranking/winner: retorna el jugador amb pitjor percentatge d’èxit
 
 ![winnermongo.PNG](captures%2Fwinnermongo.PNG)
 ![winnermongo2.PNG](captures%2Fwinnermongo2.PNG)
